@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>rooms</title>
+</head>
+<body>
+    {% for room in rooms %}
+        <a href = {% url 'message' room.id %} >{{room}}</a>
+    {% endfor %}
+    <form method='post' id='form'>
+        {%csrf_token%}
+        {{form.as_p}}
+    </form>
+    
+</body>
+<script>
+
+
+
+    
+
+</script>
+</html>

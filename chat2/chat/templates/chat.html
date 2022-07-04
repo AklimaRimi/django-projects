@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>chat</title>
+</head>
+<style>
+    .messages{
+        height: 500px;
+        overflow-y: scroll;
+        margin: 30px;
+    }
+</style>
+<body>
+    
+    <div id="messages" class='messages'>
+        {% for message in messages %}
+            <p><h3><p>{{message.name}} . {{message.date|timesince}} ago</p></h3><i>{{message.msg}}</i> </p>
+        
+        {% endfor %}
+
+    </div>
+    <form action="" id= 'form'>
+        <input id='user' type='text' placeholder='namee'><br><br>
+        <input type="text" id='message' placeholder='message'>
+        <button id='btn'>Send</button>
+    </form>
+    {{room_name.id|json_script:"room_id"}}
+    {{room_name.name|json_script:"room_name"}}
+</body>
+<script>
+    <!-- create link -->
+    const room_name = JSON.parse(document.getElementById("room_name").textContent)
+
+    const room_id = JSON.parse(document.getElementById("room_id").textContent)
+    let url = `ws://${window.location.host}/ws/${room_id}/`
+    const socket = new WebSocket(url)
+
+
+    <!-- show message on display -->
+    socket.onmessage = function(e){
+        let data = JSON.parse(e.data)
+        console.log('data: ',data )
+
+        if(data.type === 'chat'){
+            let messages= document.getElementById('messages')
+            
+            messages.insertAdjacentHTML('beforeend',
+            `<div>
+                <h3>${data.user}</h3>
+                <i>${data.message}</i>
+            </div>`
+            )
+            down()
+        }
+    }
+
+
+    <!-- handeling input after clicking submit button -->
+
+    let form = document.getElementById('form')
+    let btn = document.getElementById('btn')
+
+    btn.onclick = function(e){
+        e.preventDefault();
+        let user =  document.getElementById('user').value;
+        let msg = document.getElementById('message').value;
+
+        socket.send(JSON.stringify({
+            'type':'chat',
+            'message':msg,
+            'user':user,
+            'room_name':room_name
+        }))
+        form.reset()
+        return false;
+    
+    }
+    function down(){
+        let messages= document.getElementById('messages')
+        messages.scrollTop = messages.scrollHeight;
+    }
+    down();
+
+
+
+</script>
+</html>
